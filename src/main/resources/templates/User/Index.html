@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>dart</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Custom Google font-->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <style>
+    .profile-picture {
+        max-height: 60px;
+        max-width: 100px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+</style>
+</head>
+    <body>
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#">
+            <img th:src="@{/images/logo_dart.png}" alt="Daart Logo" class="img-fluid" style="max-height: 50px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/redirectByRole">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+             <li class="nav-item dropdown">
+			    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			       <img th:src="${session.userDetails.photo}" alt="Profile Picture" class="img-fluid profile-picture">
+			    </a>
+			    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+			        <h6 class="dropdown-header" th:text="${session.userDetails.nom + ' ' + session.userDetails.prenom}"></h6>
+                   <input type="hidden" id="userIdInput" th:value="${session.userDetails.id}" />
+
+			        <h6 class="dropdown-header" th:each="role : ${session.userDetails.roles}" th:text="${role.name}"></h6>
+			        <div class="dropdown-divider"></div>
+			        <a class="dropdown-item" href="#">View Profile</a>
+			        <div class="dropdown-divider"></div>
+			        <a class="dropdown-item" th:href="@{/MesDarets}">Mes Darets</a>
+			        <a class="dropdown-item" th:href="@{/MesDemandes}">Mes Demandes</a>
+			        <div class="dropdown-divider"></div>
+			        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#createDemandeModal">Faire une Demande ?</a>
+			        <div class="dropdown-divider"></div>
+			        <a class="dropdown-item" th:href="@{/logout}">Deconnexion</a>
+			    </div>
+			</li>
+           </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Demande Creation Modal -->
+<div class="modal fade" id="createDemandeModal" tabindex="-1" aria-labelledby="createDemandeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createDemandeModalLabel">Créer une Demande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createDemandeForm">
+                    <div class="mb-3">
+                        <label for="Libelle" class="form-label">Libelle</label>
+                        <input type="text" class="form-control" id="Libelle" placeholder="daret....">
+                    </div>
+                    <div class="mb-3">
+                        <label for="nbParticipant" class="form-label">Nombre de participants</label>
+                        <input type="number" class="form-control" id="nbParticipant" placeholder="Entrez le nombre de participants">
+                    </div>
+                    <div class="mb-3">
+                        <label for="montantPeriode" class="form-label">Montant par Période</label>
+                        <input type="number" class="form-control" id="montantPeriode" placeholder="Montant par periode">
+                    </div>
+                    <div class="mb-3">
+                        <label for="periodicite" class="form-label">périodicité</label>
+                        <select class="form-select" id="periodicite">
+                            <option value="quotidienne">Quotidienne</option>
+                            <option value="hebdomadaire">Hebdomadaire</option>
+                            <option value="mensuelle">Mensuelle</option>
+                            <option value="trimestrielle">Trimestrielle</option>
+                            <option value="semestrielle">Semestrielle</option>
+                            <option value="annuelle">Annuelle</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateDepart" class="form-label">Date de démarrage</label>
+                        <input type="date" class="form-control" id="dateDepart" placeholder="YYYY-MM-DD">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <button type="button" class="btn btn-primary" id="saveDemandeBtn">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- Section - Search Bar and Filters -->
+<section class="py-3">
+    <div class="container px-4 px-lg-5">
+        <div class="row mb-3">
+            <div class="col-md-3">
+				<label for="periodFilter" class="form-label">Filter by name:</label>
+                <input type="text" id="searchInput" placeholder="Search by name" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="periodFilter" class="form-label">Filter by Period:</label>
+                <select id="periodFilter" class="form-select">
+                    <option value="all">All Periods</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="yearly">Yearly</option>
+                    <!-- Add more options for other periods as needed -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="participantsFilter" class="form-label">Filter by Participants:</label>
+                <input type="number" id="participantsFilter" class="form-control" min="1" placeholder="Number of Participants">
+            </div>
+            <div class="col-md-3">
+                <label for="priceFilter" class="form-label">Filter by Price (DH):</label>
+                <input type="number" id="priceFilter" class="form-control" min="0" placeholder="Daret Price">
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Design Modal Amélioré -->
+<div class="modal fade" id="participerModal" tabindex="-1" role="dialog" aria-labelledby="participerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content bg-light border-0 rounded-3">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title" id="participerModalLabel">Choix du Montant</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body text-dark">
+                <input type="hidden" id="daretIdInput" />
+                <p class="lead">Voulez-vous participer  ?</p>
+                <p class="fw-bold">Le montant par période par défaut est : <span id="defaultAmount"></span></p>
+
+                <!-- Boutons radio pour afficher des options supplémentaires -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="amountChoice" id="defaultOption" checked>
+                    <label class="form-check-label" for="defaultOption">
+                        Utiliser le montant par défaut
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="amountChoice" id="customOption">
+                    <label class="form-check-label" for="customOption">
+                        Choisir un montant personnalisé
+                    </label>
+                </div>
+                <!-- Ajouter le nouveau bouton radio et l'étiquette pour la nouvelle option -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="amountChoice" id="newOption">
+                    <label class="form-check-label" for="newOption">
+                        Participer avec quelqu'un ?
+                    </label>
+                </div>
+
+                <!-- Menu déroulant pour des options supplémentaires -->
+                <div class="form-group mb-3" id="amountDropdownGroup" style="display: none;">
+                    <label for="amountInput" class="form-label">Choisir le montant :</label>
+                    <select id="amountInput" class="form-select">
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="validateAmount">Valider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5" id="productCardContainer" >
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            <!-- Existing code for product cards will be dynamically added here by JavaScript -->
+        </div>
+    </div>
+</section>
+
+
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; dart 2023</p></div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+     
+	<script src="/js/jquery.min.js" ></script>
+	<script src="/js/jquery-ui.min.js" ></script>
+	
+	<script src="/js/popper.js" type="text/javascript"></script>
+	
+	<script src="/js/jquery.dataTables.min.js" type="text/javascript"></script>
+	<script src="/js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="/js/dataTables.bootstrap.js" type="text/javascript"></script>
+    <script src="/js/main.js" type="text/javascript"></script>
+    
+    
+    <script src="/js/dataTables.buttons.min.js" type="text/javascript"></script>
+	<script src="/js/buttons.flash.min.js" type="text/javascript"></script>
+	<script src="/js/pdfmake.min.js" type="text/javascript"></script>
+	<script src="/js/vfs_fonts.js" type="text/javascript"></script>
+	<script src="/js/buttons.html5.min.js" type="text/javascript"></script>
+	<script src="/js/buttons.print.min.js" type="text/javascript"></script>
+<script>
+$(document).ready(function () {
+	
+	
+ $("#saveDemandeBtn").click(function () {
+    // Get values from form fields
+    var libelle = $("#Libelle").val();
+    var nbParticipant = $("#nbParticipant").val();
+    var montantPeriode = $("#montantPeriode").val();
+    var periodicite = $("#periodicite").val();
+    var dateDepart = $("#dateDepart").val();
+	var userId = $("#userIdInput").val();
+	
+    // Create a data object
+    var data = {
+        libelle: libelle,
+        nbParticipant: nbParticipant,
+        montantPeriode: montantPeriode,
+        periodicite: periodicite,
+        dateDepart: dateDepart,
+        utilisateur: { id: userId }
+        // Add more properties as needed
+    };
+
+    // Convert the data object to JSON
+    var jsonData = JSON.stringify(data);
+
+    // AJAX request
+    $.ajax({
+        type: "POST",
+        url: "/api/demande/savedemande",
+        contentType: "application/json",
+        data: jsonData,
+        success: function (response) {
+            $("#createDemandeModal").modal("hide");
+        },
+        error: function (xhr, status, error) {
+            // Display error messages to the user
+            if (xhr.responseJSON && Array.isArray(xhr.responseJSON)) {
+                // Concatenate error messages into a single string
+                var errorMessages = xhr.responseJSON.join("\n");
+                alert( errorMessages);
+            } else {
+                alert("An unexpected error occurred.");
+            }
+        }
+    });
+});
+
+	    // Fetch and display 'daret' objects
+    function fetchDarets() {
+        $.ajax({
+            url: '/api/daret/all',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                updateDaretContainer(data);
+            },
+            error: function (error) {
+                console.error('Error fetching darets: ', error);
+            }
+        });
+    }
+
+fetchDarets();
+ // Function to update the 'daret' container with fetched data
+function updateDaretContainer(darets) {
+    var container = $('#productCardContainer .row');
+    var userId = $('#userIdInput').val();
+    container.empty(); // Clear existing content
+
+    darets.forEach(function (daret) {
+        // Create HTML for each 'daret' and append to the container
+        var html = '<div class="col mb-5">';
+        html += '<div class="card h-100">';
+        html += '<img class="card-img-top" src="/images/templateImage.jpg" alt="..." />';
+        html += '<div class="card-body p-4">';
+        html += '<div class="text-center">';
+        html += '<h5 class="fw-bolder">' + daret.libelle + '</h5>';
+
+        // Montant par période
+        html += '<div class="d-flex justify-content-center small text-warning mb-2">';
+        html += '<h5 class="fw-bolder">' + daret.montantPeriode + ' ' + 'DH' + '</h5>';
+        html += '</div>';
+
+        // Number of participants with Bootstrap icon
+        html += '<div class="d-flex justify-content-center small text-info mb-2">';
+        html += '<div class="fw-bolder"><i class="bi bi-person"></i> ' + daret.nbParticipantEnCour + '/' + daret.nbParticipant + ' participants</div>';
+        html += '</div>';
+
+        // Date of departure formatted as "dd/mm/yyyy"
+        var dateDepart = new Date(daret.dateDepart);
+        var formattedDate = dateDepart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        html += '<div><span class="fw-bolder">Date de départ:</span> ' + formattedDate + '</div>';
+        html += '<div class="d-flex justify-content-center small text-info mb-2">';
+        html += '<div class="fw-bolder">' + daret.periodicite + '</div>';
+        html += '</div>';
+        html += '<div class="fw-bolder text-success">' + daret.status + '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // Status-dependent button
+        if (daret.status !== "Demarer") {
+            html += '<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">';
+            html += '<div class="text-center">';
+            html += '<a class="btn btn-outline-dark mt-auto participate-btn" ' +
+                'data-bs-toggle="modal" data-bs-target="#participerModal" ' +
+                'data-id="' + daret.id + '" ">Participer</a>';
+            html += '</div>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+
+        container.append(html);
+    });
+}
+
+
+
+
+// Handle modal show event
+$('#participerModal').on('show.bs.modal', function (event) {
+    // Get the button that triggered the modal
+    var button = $(event.relatedTarget);
+    // Extract the data-id attribute value
+    var daretId = button.data('id');
+
+    // Update the hidden inputs with the values
+    $('#daretIdInput').val(daretId);
+
+    // Fetch the specific 'daret' based on the ID using AJAX
+    $.ajax({
+        url: '/api/daret/' + daretId,
+        type: 'GET',
+        dataType: 'json',
+        success: function (selectedDaret) {
+            // Generate dropdown options based on the selected 'daret'
+            var defaultAmount = selectedDaret.montantPeriode;
+            $('#defaultAmount').text(defaultAmount);
+
+			    var dropdownOptions = '';
+				 var nbMontantA_afficher = selectedDaret.nbParticipant - selectedDaret.nbParticipantEnCour;
+
+				    for (var i = 1; i <= nbMontantA_afficher; i++) {
+				        var optionValue = i * selectedDaret.montantPeriode;
+				        dropdownOptions += '<option value="' + i + '">' + optionValue + ' DH' + '</option>';
+				    }
+            // Update the amountInput dropdown with the new options
+            $('#amountInput').html(dropdownOptions);
+
+            // Set the default option as checked and hide the dropdown initially
+            $('#defaultOption').prop('checked', true);
+            $('#amountDropdownGroup').hide();
+        },
+        error: function (error) {
+            console.error('Error fetching daret details: ', error);
+            // Handle the error appropriately
+        }
+    });
+});
+
+// Handle radio button change event
+$('input[name="amountChoice"]').change(function () {
+    if ($('#defaultOption').is(':checked')) {
+       $('#amountDropdownGroup').hide();
+    } else if ($('#customOption').is(':checked')) {
+        $.ajax({
+            url: '/api/daret/' + $('#daretIdInput').val(),
+            type: 'GET',
+            dataType: 'json',
+            success: function (selectedDaret) {
+                   var dropdownOptions = '';
+				    var nbMontantA_afficher = selectedDaret.nbParticipant - selectedDaret.nbParticipantEnCour;
+				console.log(nbMontantA_afficher);
+				    for (var i = 1; i <= nbMontantA_afficher; i++) {
+				        var optionValue = i * selectedDaret.montantPeriode;
+				        dropdownOptions += '<option value="' + i + '">' + optionValue + ' DH' + '</option>';
+				    }
+
+                // Update the amountInput dropdown with the new options
+                $('#amountInput').html(dropdownOptions);
+            },
+            error: function (error) {
+                console.error('Error fetching daret details: ', error);
+                // Handle the error appropriately
+            }
+        });      
+          $('#amountDropdownGroup').show();
+    }else if ($('#newOption').is(':checked')){
+		 $.ajax({
+            url: '/api/daret/' + $('#daretIdInput').val(),
+            type: 'GET',
+            dataType: 'json',
+            success: function (selectedDaret) {
+					var dropdownOptions = '';
+                    var optionValue = (selectedDaret.montantPeriode / 2) ;
+                    dropdownOptions += '<option value="' + 0.5 + '">' + optionValue + ' DH' + '</option>';
+              $('#amountInput').html(dropdownOptions);
+            },
+            error: function (error) {
+                console.error('Error fetching daret details: ', error);
+                // Handle the error appropriately
+            }
+            
+        });   
+              		  $('#amountDropdownGroup').show();   		
+	}else{
+		$('#amountDropdownGroup').hide();
+	}
+});
+
+
+
+
+
+
+
+
+
+// Handle Validate button click inside the modal
+$('#validateAmount').click(function () {
+    // Get the selected amount from the dropdown
+    var nbParticipantOrdered = $('#amountInput').find(":selected").val();
+    var selectedAmount = parseFloat($('#amountInput').find(":selected").text()); // Parse the selectedAmount as a float
+
+    // Get the stored values from the hidden inputs
+    var daretId = $('#daretIdInput').val();
+    var userId = $('#userIdInput').val();
+    console.log('Daret ID:', daretId);
+    console.log('User ID:', userId);
+    var dateParticipation = new Date();
+
+    if (selectedAmount && selectedAmount >= 1) {
+        $.ajax({
+            url: '/api/position/create',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              daret: { id: daretId },        
+      		  utilisateur: { id: userId },  
+                proposedAmount: selectedAmount,
+                nbParticipantOrdered: nbParticipantOrdered,
+                dateParticipation:dateParticipation
+                
+            }),
+            success: function (response) {
+                // Handle the success response from the server
+                console.log('Position added successfully:', response);
+
+                // Close the modal
+                $('#participerModal').modal('hide');
+                fetchDarets();
+
+            },
+        // Dans votre callback d'erreur AJAX
+			error: function (xhr, status, error) {
+			    if (xhr.status === 400) {
+			        alert('vous etez déjà dans une position pour ce daret. Veuillez choisir une autre .');
+			    } else {
+			        alert('Erreur lors de l\'ajout de la position. Veuillez réessayer.');
+			    }
+			},
+
+        });
+    } else {
+        // Display an error message or handle invalid input
+        alert('Please enter a valid amount.');
+    }
+});
+
+    
+
+    
+    });
+</script>
+
+</body>
+</html>
+
